@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Расхитель сокровищ</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="game-container">
+        <h1>Расхитель сокровищ</h1>
+        
+        <p id="intro">Выбери оптимальные предметы, для того чтобы получить максимальную выгоду!</p>
+        
+        <div id="game-content" class="hidden">
+            <div id="level-title">Уровень 1</div>
+
+            <div id="stats-container">
+                <div class="stat">Рюкзак: <span id="current-weight">0</span> / <span id="capacity">15</span> кг</div>
+                <div class="stat">Стоимость: <span id="current-value">0</span> 💲</div>
+            </div>
+
+            <div id="game-area">
+                <div id="items-pool" class="dropzone">
+                    <h2>Доступные предметы</h2>
+                </div>
+                <div id="backpack" class="dropzone">
+                    <h2>Ваш рюкзак</h2>
+                </div>
+            </div>
+        </div>
+
+        <div id="controls">
+            <button id="start-btn">Начать игру</button>
+            <button id="check-btn" class="hidden">Проверить результат</button>
+            <button id="next-level-btn" class="hidden">Следующий уровень</button>
+        </div>
+        
+        <div id="result-message" class="hidden"></div>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+body {
+    font-family: 'Nunito', sans-serif;
+    background-color: #f0f4f8;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+#game-container {
+    width: 90%;
+    max-width: 1000px;
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 25px;
+    text-align: center;
+}
+#game-area {
+    display: flex;
+    gap: 20px;
+}
+.dropzone {
+    flex-basis: 48%;
+    min-height: 400px;
+    border: 3px dashed #bdc3c7;
+    padding: 15px;
+}
+.hidden {
+    display: none;
+}
