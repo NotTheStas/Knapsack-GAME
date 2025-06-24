@@ -3,6 +3,8 @@ const intro = document.getElementById('intro');
 const gameContent = document.getElementById('game-content');
 const itemsPool = document.getElementById('items-pool');
 const backpack = document.getElementById('backpack-items');
+const currentWeightStat = document.getElementById('current-weight');
+const currentValueStat = document.getElementById('current-value');
 
 const checkBtn = document.getElementById('check-btn');
 const nextLevelBtn = document.getElementById('next-level-btn');
@@ -53,6 +55,7 @@ const LEVEL_CONFIG = [
 
 let currentLevel = 1;
 let backpackCapacity;
+let optimalValue = 0;
 
 function generateItems(numItems) {
     itemsPool.innerHTML = '';
@@ -84,6 +87,32 @@ function generateItems(numItems) {
 	setupDragAndDrop();
 }
 
+function updateStats() {
+	let totalWeight = 0;
+	let totalValue = 0;
+    const itemsInBackpack = backpack.querySelectorAll('.item');
+
+    itemsInBackpack.forEach(item => {
+        const detailsText = item.querySelector('.item-details').textContent;
+        
+        const weightMatch = detailsText.match(/Вес: (\d+)/); 
+        const valueMatch = detailsText.match(/Стоимость: (\d+)/);
+
+        if (weightMatch) {
+            totalWeight += parseInt(weightMatch[1], 10);
+        }
+        if (valueMatch) {
+            totalValue += parseInt(valueMatch[1], 10);
+        }
+    });
+
+    currentWeightStat.textContent = totalWeight;
+    currentValueStat.textContent = totalValue;
+	return totalWeight; 
+}
+
+
+
 function setupDragAndDrop() {
     const items = document.querySelectorAll('.item');
 
@@ -107,9 +136,21 @@ function setupDragAndDrop() {
             const draggableElement = document.getElementById(id);
 
             const dropzone = event.target.closest('.dropzone');
-            if (dropzone) {
+            if (dropzone === backpack) {
+                const itemDetails = draggableElement.querySelector('.item-details').textContent;
+                const itemWeightMatch = itemDetails.match(/Вес: (\d+)/);
+                const itemWeight = itemWeightMatch ? parseInt(itemWeightMatch[1], 10) : 0;
+
+                const currentBackpackWeight = updateStats();
+                
+                if (currentBackpackWeight + itemWeight <= backpackCapacity) {
+                    dropzone.appendChild(draggableElement);
+                }
+            } else {
                 dropzone.appendChild(draggableElement);
             }
+
+            updateStats();
         });
     });
 }
@@ -126,12 +167,53 @@ function startLevel() {
     capacitySpan.textContent = backpackCapacity;
 
     generateItems(config.numItems);
+	updateStats();
+	solveKnapsack();
+}
+
+function solveKnapsack() {
+    const availableItems = [];
+    itemsPool.querySelectorAll('.item').forEach(item => {
+        const detailsText = item.querySelector('.item-details').textContent;
+        const weightMatch = detailsText.match(/Вес: (\d+)/);
+        const valueMatch = detailsText.match(/Стоимость: (\d+)/);
+
+        if (weightMatch && valueMatch) {
+            availableItems.push({
+                weight: parseInt(weightMatch[1], 10),
+                value: parseInt(valueMatch[1], 10)
+            });
+        }
+    });
+
+    const n = availableItems.length;
+    const W = backpackCapacity;
+
+    const dp = Array(n + 1).fill(0).map(() => Array(W + 1).fill(0));
+
+    for (let i = 1; i <= n; i++) {
+        const currentItem = availableItems[i - 1];
+        for (let w = 1; w <= W; w++) {
+            if (currentItem.weight > w) {
+                dp[i][w] = dp[i - 1][w];
+            } else {
+
+                dp[i][w] = Math.max(
+                    dp[i - 1][w],
+                    currentItem.value + dp[i - 1][w - currentItem.weight]
+                );
+            }
+        }
+    }
+
+    const maxVal = dp[n][W];
+    optimalValue = maxVal;
 }
 
 function showVictoryScreen() {
     gameContent.classList.add('hidden');
     checkBtn.classList.add('hidden');
-    resultMessage.textContent = "Поздравляю! Вы прошли все уровни!";
+    resultMessage.textContent = "Поздравляю! Вы прошли игру!";
     resultMessage.classList.remove('hidden');
     startBtn.textContent = 'Начать заново';
     startBtn.classList.remove('hidden');
@@ -151,7 +233,7 @@ checkBtn.addEventListener('click', () => {
     checkBtn.classList.add('hidden');
 
     if (currentLevel < LEVEL_CONFIG.length) {
-        resultMessage.textContent = "Отлично! Готов к следующему испытанию?";
+        resultMessage.textContent = "Отлично! Можешь перейти на следующий уровень!";
         resultMessage.classList.remove('hidden');
         nextLevelBtn.classList.remove('hidden');
     } else {
