@@ -2,7 +2,7 @@ const startBtn = document.getElementById('start-btn');
 const intro = document.getElementById('intro');
 const gameContent = document.getElementById('game-content');
 const itemsPool = document.getElementById('items-pool');
-const backpack = document.getElementById('backpack');
+const backpack = document.getElementById('backpack-items');
 
 const checkBtn = document.getElementById('check-btn');
 const nextLevelBtn = document.getElementById('next-level-btn');
@@ -39,8 +39,8 @@ let currentLevel = 1;
 let backpackCapacity;
 
 function generateItems(numItems) {
-    itemsPool.innerHTML = '<h2>Доступные предметы</h2>';
-	backpack.innerHTML = '<h2>Ваш рюкзак</h2>';
+    itemsPool.innerHTML = '';
+	backpack.innerHTML = '';
 	
 	const shuffledTemplates = ITEM_TEMPLATES.sort(() => 0.5 - Math.random());
 	const levelItems = shuffledTemplates.slice(0, numItems);
