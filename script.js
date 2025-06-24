@@ -4,6 +4,12 @@ const gameContent = document.getElementById('game-content');
 const itemsPool = document.getElementById('items-pool');
 const backpack = document.getElementById('backpack');
 
+const checkBtn = document.getElementById('check-btn');
+const nextLevelBtn = document.getElementById('next-level-btn');
+const levelTitle = document.getElementById('level-title');
+const capacitySpan = document.getElementById('capacity');
+const resultMessage = document.getElementById('result-message');
+
 const ITEM_TEMPLATES = [
     { name: "Золотой самородок", icon: "✨" },
     { name: "Древний свиток", icon: "📜" },
@@ -23,17 +29,25 @@ const ITEM_TEMPLATES = [
 	
 ];
 
-let backpackCapacity = 15;
+const LEVEL_CONFIG = [
+    { capacity: 10, numItems: 4 },
+    { capacity: 15, numItems: 7 },
+    { capacity: 20, numItems: 10 } 
+];
 
+let currentLevel = 1;
+let backpackCapacity;
 
-function generateItems() {
-    const existingItems = itemsPool.querySelectorAll('.item');
-    existingItems.forEach(item => item.remove());
+function generateItems(numItems) {
+    itemsPool.innerHTML = '<h2>Доступные предметы</h2>';
+	backpack.innerHTML = '<h2>Ваш рюкзак</h2>';
 	
-    ITEM_TEMPLATES.forEach((template, index) => {
+	const shuffledTemplates = ITEM_TEMPLATES.sort(() => 0.5 - Math.random());
+	const levelItems = shuffledTemplates.slice(0, numItems);
+	
+    levelItems.forEach((template, index) => {
         const itemElement = document.createElement('div');
         itemElement.className = 'item';
-        
 		itemElement.id = 'item-' + index;
         itemElement.draggable = true; 
 		
@@ -84,10 +98,52 @@ function setupDragAndDrop() {
     });
 }
 
+function startLevel() {
+    resultMessage.classList.add('hidden');
+    nextLevelBtn.classList.add('hidden');
+    checkBtn.classList.remove('hidden');
+
+    const config = LEVEL_CONFIG[currentLevel - 1];
+    backpackCapacity = config.capacity;
+
+    levelTitle.textContent = `Уровень ${currentLevel}`;
+    capacitySpan.textContent = backpackCapacity;
+
+    generateItems(config.numItems);
+}
+
+function showVictoryScreen() {
+    gameContent.classList.add('hidden');
+    checkBtn.classList.add('hidden');
+    resultMessage.textContent = "Поздравляю! Вы прошли все уровни!";
+    resultMessage.classList.remove('hidden');
+    startBtn.textContent = 'Начать заново';
+    startBtn.classList.remove('hidden');
+}
+
+
 startBtn.addEventListener('click', () => {
     intro.classList.add('hidden');
     startBtn.classList.add('hidden');
     gameContent.classList.remove('hidden');
-    
-    generateItems();
+
+    currentLevel = 1;
+    startLevel();
+});
+
+checkBtn.addEventListener('click', () => {
+    checkBtn.classList.add('hidden');
+
+    if (currentLevel < LEVEL_CONFIG.length) {
+        resultMessage.textContent = "Отлично! Готов к следующему испытанию?";
+        resultMessage.classList.remove('hidden');
+        nextLevelBtn.classList.remove('hidden');
+    } else {
+        showVictoryScreen();
+    }
+});
+
+nextLevelBtn.addEventListener('click', () => {
+    currentLevel++;
+    startLevel();
 });
