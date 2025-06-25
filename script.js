@@ -44,13 +44,14 @@ const ITEM_TEMPLATES = [
 	{ name: "Всевидящее око", icon: "👁️" },
 	{ name: "Морской требузец", icon: "🔱" }
 	
-	
 ];
 
 const LEVEL_CONFIG = [
     { capacity: 10, numItems: 4 },
-    { capacity: 15, numItems: 7 },
-    { capacity: 20, numItems: 10 } 
+	{ capacity: 15, numItems: 5 },
+    { capacity: 15, numItems: 6 },
+	{ capacity: 20, numItems: 7 },
+	{ capacity: 55, numItems: 8 },
 ];
 
 let currentLevel = 1;
@@ -58,6 +59,7 @@ let backpackCapacity;
 let optimalValue = 0;
 
 function generateItems(numItems) {
+
     itemsPool.innerHTML = '';
 	backpack.innerHTML = '';
 	
@@ -230,14 +232,27 @@ startBtn.addEventListener('click', () => {
 });
 
 checkBtn.addEventListener('click', () => {
-    checkBtn.classList.add('hidden');
+    const playerValue = parseInt(currentValueStat.textContent, 10);
 
-    if (currentLevel < LEVEL_CONFIG.length) {
-        resultMessage.textContent = "Отлично! Можешь перейти на следующий уровень!";
-        resultMessage.classList.remove('hidden');
-        nextLevelBtn.classList.remove('hidden');
+    checkBtn.classList.add('hidden');
+    
+    if (playerValue === optimalValue) {
+        
+        if (currentLevel < LEVEL_CONFIG.length) {
+            resultMessage.textContent = `Отлично! Максимальная выгода ${optimalValue} 💲 достигнута!`;
+            resultMessage.classList.remove('hidden');
+            nextLevelBtn.classList.remove('hidden');
+        } else {
+            showVictoryScreen();
+        }
     } else {
-        showVictoryScreen();
+
+        resultMessage.textContent = `Не оптимальный результат! Ты набрал ${playerValue} 💲, а мог бы ${optimalValue} 💲. Попробуй еще раз!`;
+        resultMessage.classList.remove('hidden');
+
+        setTimeout(() => {
+            startLevel(); 
+        }, 5000);
     }
 });
 
