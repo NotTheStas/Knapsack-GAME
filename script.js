@@ -281,15 +281,23 @@ document.addEventListener('touchend', (event) => {
         moving.style.position = "static";
         let touch = event.changedTouches[0];
         let coordBackpack = backpack.getBoundingClientRect().left;
-        let coordItemsPool = itemsPool.getBoundingClientRect.right;
 
         if (coordBackpack < touch.pageX) {
-            backpack.appendChild(moving);
+            const itemDetails = moving.textContent;
+            const itemWeightMatch = itemDetails.match(/Вес: (\d+)/);
+            const itemWeight = itemWeightMatch ? parseInt(itemWeightMatch[1], 10) : 0;
+
+            const currentBackpackWeight = updateStats();
+
+            if (currentBackpackWeight + itemWeight <= backpackCapacity) {
+                backpack.appendChild(moving);
+            }
         }
         
         else {
             itemsPool.appendChild(moving);
         }
+        updateStats();
         moving = null;
     }
 });
