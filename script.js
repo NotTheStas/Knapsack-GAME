@@ -42,7 +42,8 @@ const ITEM_TEMPLATES = [
 	{ name: "Каменный идол", icon: "🗿" },
     { name: "Амулет удачи", icon: "🍀" },
 	{ name: "Всевидящее око", icon: "👁️" },
-	{ name: "Морской требузец", icon: "🔱" }
+	{ name: "Морской требузец", icon: "🔱" },
+    { name: "Рог единорога", icon: "🦄" }
 	
 ];
 
@@ -57,6 +58,7 @@ const LEVEL_CONFIG = [
 let currentLevel = 1;
 let backpackCapacity;
 let optimalValue = 0;
+let moving = null;
 
 function generateItems(numItems) {
 
@@ -121,6 +123,10 @@ function setupDragAndDrop() {
     items.forEach(item => {
         item.addEventListener('dragstart', (event) => {
             event.dataTransfer.setData('text/plain', event.target.id);
+        });
+
+        item.addEventListener('touchstart', (event) => {
+            moving = item;
         });
     });
 
@@ -259,4 +265,31 @@ checkBtn.addEventListener('click', () => {
 nextLevelBtn.addEventListener('click', () => {
     currentLevel++;
     startLevel();
+});
+
+document.addEventListener("touchmove", (event) => {
+    if (moving) {
+        let touch = event.targetTouches[0];
+        moving.style.position = "absolute";
+        moving.style.left = `${touch.pageX}px`;
+        moving.style.top = `${touch.pageY}px`;
+    }
+})
+
+document.addEventListener('touchend', (event) => {
+    if (moving) {
+        moving.style.position = "static";
+        let touch = event.changedTouches[0];
+        let coordBackpack = backpack.getBoundingClientRect().left;
+        let coordItemsPool = itemsPool.getBoundingClientRect.right;
+
+        if (coordBackpack < touch.pageX) {
+            backpack.appendChild(moving);
+        }
+        
+        else {
+            itemsPool.appendChild(moving);
+        }
+        moving = null;
+    }
 });

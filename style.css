@@ -77,6 +77,14 @@ button:hover {
     margin: 30px;
 }
 
+#level-title {
+    font-size: 13px;
+}
+
+h1 {
+    font-size: 48px;
+}
+
 @media (max-width: 701px) {
     #game-area {
         gap: 15px;
@@ -94,6 +102,7 @@ button:hover {
 
     h2 {
         height: 55px;
+        font-size: 18px;
     }
 
     .item-details {
@@ -106,6 +115,10 @@ button:hover {
 
     .dropzone {
         min-height: 512px;
+    }
+
+    h1 {
+        font-size: 36px;
     }
 }
 
