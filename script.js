@@ -37,31 +37,35 @@ let visualizationSteps = [];
 let currentStepIndex = -1;
 let levelItemsForTable = [];
 
-function generateItems(numItems) {
-    itemsPool.innerHTML = '';
-    backpack.innerHTML = '';
+function createItemDataForLevel(numItems) {
     levelItemsForTable = [];
 
     const shuffledTemplates = ITEM_TEMPLATES.sort(() => 0.5 - Math.random());
     const levelItems = shuffledTemplates.slice(0, numItems);
 
-    levelItems.forEach((template, index) => {
+    levelItems.forEach(template => {
+        const randomWeight = Math.floor((Math.random() * (backpackCapacity / 2) + 1));
+        const randomValue = Math.floor(Math.random() * 451) + 50;
+        levelItemsForTable.push({ ...template, weight: randomWeight, value: randomValue });
+    });
+}
+
+function renderItemsFromData() {
+    itemsPool.innerHTML = '';
+    backpack.innerHTML = '';
+
+    levelItemsForTable.forEach((itemData, index) => {
         const itemElement = document.createElement('div');
         itemElement.className = 'item';
         itemElement.id = 'item-' + index;
         itemElement.draggable = true;
 
-        const randomWeight = Math.floor((Math.random() * (backpackCapacity / 2) + 1));
-        const randomValue = Math.floor(Math.random() * 451) + 50;
-
-        levelItemsForTable.push({ ...template, weight: randomWeight, value: randomValue });
-
         itemElement.innerHTML = `
-            <div class="item-icon">${template.icon}</div>
+            <div class="item-icon">${itemData.icon}</div>
             <div class="item-details">
-                <strong>${template.name}</strong><br>
-                Вес: ${randomWeight} кг<br>
-                Стоимость: ${randomValue} 💲
+                <strong>${itemData.name}</strong><br>
+                Вес: ${itemData.weight} кг<br>
+                Стоимость: ${itemData.value} 💲
             </div>
         `;
         itemsPool.appendChild(itemElement);
@@ -125,18 +129,29 @@ function startLevel() {
     nextLevelBtn.classList.add('hidden');
     checkBtn.classList.remove('hidden');
     showTableBtn.classList.remove('hidden');
-
     hideDPTable();
 
     const config = LEVEL_CONFIG[currentLevel - 1];
     backpackCapacity = config.capacity;
-    levelTitle.textContent = `Уровень ${currentLevel}`; 
+    levelTitle.textContent = `Уровень ${currentLevel}`;
     capacitySpan.textContent = backpackCapacity;
 
-    generateItems(config.numItems);
-    updateStats();
+    createItemDataForLevel(config.numItems);
     solveKnapsack();
+    renderItemsFromData();
+    updateStats();
 }
+
+function retryLevel() {
+    resultMessage.classList.add('hidden');
+    checkBtn.classList.remove('hidden');
+    showTableBtn.classList.remove('hidden');
+    hideDPTable();
+    
+    renderItemsFromData(); 
+    updateStats();
+}
+
 
 function solveKnapsack() {
     const items = levelItemsForTable;
@@ -313,7 +328,7 @@ checkBtn.addEventListener('click', () => {
         resultMessage.textContent = `Не оптимальный результат! Ты набрал ${playerValue} 💲, а мог бы ${optimalValue} 💲. Попробуй еще раз!`;
         resultMessage.classList.remove('hidden');
         setTimeout(() => {
-            startLevel();
+            retryLevel();
         }, 5000);
     }
 });
