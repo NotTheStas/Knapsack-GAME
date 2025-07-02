@@ -269,6 +269,8 @@ nextLevelBtn.addEventListener('click', () => {
 
 document.addEventListener("touchmove", (event) => {
     if (moving) {
+        event.preventDefault();
+        event.stopPropagation();
         let touch = event.targetTouches[0];
         moving.style.position = "absolute";
         moving.style.left = `${touch.pageX}px`;
